@@ -6,7 +6,7 @@
 /*   By: zsonie <zsonie@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/11 23:59:27 by zsonie            #+#    #+#             */
-/*   Updated: 2026/04/12 03:47:38 by zsonie           ###   ########lyon.fr   */
+/*   Updated: 2026/04/12 22:45:59 by zsonie           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,22 +15,46 @@
 #include <iomanip>
 #include <cstdlib>
 #include <cmath>
+#include <cerrno>
 
-enum Type {CHAR, INT, FLOAT, DOUBLE};
+enum Type {CHAR, INT, FLOAT, DOUBLE, UNKNOWN};
 
 static Type detectType(std::string const &str)
 {
-    if (str[0] == '\'' && str[str.length()-1] == '\'')
+	//char
+    if (str.length() == 3 && str[0] == '\'' && str[2] == '\'')
 		return CHAR;
+
+	//specific cases
     if (str == "-inff" || str == "+inff" || str == "nanf")
 		return FLOAT;
     if (str == "-inf" || str == "+inf" || str == "nan")
 		return DOUBLE;
-	if (str.length() > 1 && str[str.length()-1] == 'f' && std::isdigit(str[str.length()-2]))
+
+	//float
+	errno = 0;
+	char *checkf;
+	float tmpfloat = std::strtof(str.c_str(), &checkf);
+	static_cast<void>(tmpfloat);
+	if (checkf[0] == 'f' && !checkf[1] && errno != ERANGE)
 		return FLOAT;
-	if (str.find('.') != std::string::npos)
+	
+	//double
+	errno = 0;
+	char *checkd;
+	double tmpdouble = std::strtod(str.c_str(), &checkd);
+	static_cast<void>(tmpdouble);
+	if (!checkd[0])
 		return DOUBLE;
-    return INT;
+
+	//int
+	errno = 0;
+	char *checki;
+	long tmplong = std::strtol(str.c_str(), &checki, 10);
+	static_cast<void>(tmplong);
+	if (!checki[0] && errno != ERANGE)
+    	return INT;
+	return UNKNOWN;
 }
 
 static void printFromChar(char c)
@@ -47,26 +71,23 @@ static void printFromChar(char c)
 	<< static_cast<double>(c) << std::endl;
 } 
 
-static void printFromInt(long l)
+static void printFromInt(int i)
 {
 	std::cout << "char: ";
-	if (l < 0 || l > 127)
+	if (i < 0 || i > 127)
 		std::cout << "impossible" << std::endl;
-	else if (!isprint(static_cast<int>(l)))
+	else if (!isprint(i))
 		std::cout << "non-displayable" << std::endl;
 	else
-		std::cout << "'" << static_cast<char>(l) << "'" << std::endl;
+		std::cout << "'" << static_cast<char>(i) << "'" << std::endl;
 	
 	std::cout << "int: ";
-	if (l < -2147483648 || l > 2147483647)
-		std::cout << "impossible" << std::endl;
-	else
-		std::cout << static_cast<int>(l) << std::endl;
+	std::cout << i << std::endl;
 
 	std::cout << "float: " << std::fixed << std::setprecision(1) \
-	<< static_cast<float>(l) << "f" << std::endl;
+	<< static_cast<float>(i) << "f" << std::endl;
 	std::cout << "double: " << std::fixed << std::setprecision(1) \
-	<< static_cast<double>(l) << std::endl;
+	<< static_cast<double>(i) << std::endl;
 }
 
 static void printFromFloat(float f)
@@ -129,11 +150,11 @@ static void printFromDouble(double d)
 		std::cout << static_cast<int>(d) << std::endl;
 
 	std::cout << "float: ";
-	if (std::isnan(d))
+	if (std::isnan(static_cast<float>(d)))
 		std::cout << "nanf" << std::endl;
-	else if (std::isinf(d) && d > 0)
+	else if (std::isinf(static_cast<float>(d)) && d > 0)
 		std::cout << "+inff" << std::endl;
-	else if (std::isinf(d) && d < 0)
+	else if (std::isinf(static_cast<float>(d)) && d < 0)
 		std::cout << "-inff" << std::endl;
 	else
 		std::cout << std::fixed << std::setprecision(1) \
@@ -155,20 +176,22 @@ static void printFromDouble(double d)
 void ScalarConverter::convert(std::string const &str)
 {
 	Type type = detectType(str);
-
 	switch (type)
 	{
 		case CHAR:
 			printFromChar(str[1]);
 			break;
 		case INT:
-			printFromInt(std::strtol(str.c_str(), NULL, 10));
+			printFromInt(std::atoi(str.c_str()));
 			break;
 		case FLOAT:
 			printFromFloat(std::strtof(str.c_str(), NULL));
 			break;
 		case DOUBLE:
 			printFromDouble(std::strtod(str.c_str(), NULL));
+			break;
+		case UNKNOWN:
+			std::cout << "Unknown type, pls retry!" << std::endl;
 			break;
 	}
 }
