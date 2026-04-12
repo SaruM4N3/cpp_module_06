@@ -6,49 +6,26 @@
 /*   By: zsonie <zsonie@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/11 23:59:27 by zsonie            #+#    #+#             */
-/*   Updated: 2026/04/12 01:25:18 by zsonie           ###   ########lyon.fr   */
+/*   Updated: 2026/04/12 02:10:45 by zsonie           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ScalarConverter.hpp"
 #include <iostream>
-
-ScalarConverter::ScalarConverter()
-{
-    if (DEBUG_MODE)
-        std::cout << CYAN << "Default constructor called"
-                  << RESET << std::endl;
-}
-ScalarConverter::ScalarConverter(ScalarConverter &src)
-{
-    if (DEBUG_MODE)
-	    std::cout << CYAN << "Copy constructor called"
-	              << RESET << std::endl;
-}
-ScalarConverter &ScalarConverter::operator=(ScalarConverter const &copy)
-{
-    std::cout << CYAN << "Copy assignment operator called"
-              << RESET << std::endl;
-    return *this;
-}
-ScalarConverter::~ScalarConverter()
-{
-    std::cout << RED << "Destructor called"
-              << RESET << std::endl;
-}
+#include <iomanip>
 
 enum Type {CHAR, INT, FLOAT, DOUBLE};
 
 static Type detectType(std::string const &str)
 {
-    if (str.length() == 3 && str[0] == '\'' && str[2] == '\'')
-        return CHAR;
+    if (str[0] == '\'' && str[str.length()-1] == '\'')
+		return CHAR;
     if (str == "-inff" || str == "+inff" || str == "nanf")
-        return FLOAT;
+		return FLOAT;
     if (str == "-inf" || str == "+inf" || str == "nan")
-        return DOUBLE;
+		return DOUBLE;
 	if (str.length() > 1 && str[str.length()-1] == 'f')
-        return FLOAT;
+		return FLOAT;
 	//find does return the index where the '.' has been found
 	//or std::string::npos when '.' isnt found
 	//so if not found it goes directly to return INT
@@ -57,9 +34,16 @@ static Type detectType(std::string const &str)
     return INT;
 }
 
-static void printFromChar()
+static void printFromChar(char c)
 {
-	
+	std::cout << "char: ";
+	if (!isprint(c))
+		std::cout << "non-displayable" << std::endl;
+	else
+		std::cout << "'" << c << "'" << std::endl;
+	std::cout << "int: " << static_cast<int>(c) << std::endl;
+	std::cout << "float: " << std::fixed << std::setprecision(1) << static_cast<float>(c) << "f" << std::endl;
+	std::cout << "double: " << std::fixed << std::setprecision(1) << static_cast<double>(c) << std::endl;
 } 
 
 void ScalarConverter::convert(std::string const &str)
@@ -69,7 +53,7 @@ void ScalarConverter::convert(std::string const &str)
 	switch (type)
 	{
 		case CHAR:
-			//printFromChar();
+			printFromChar(str[1]);
 			break;
 		case INT:
 			//printFromInt();
