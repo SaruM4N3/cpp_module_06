@@ -1,11 +1,11 @@
-NAME = ScalarConverter
+NAME = serializer
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 NORELINK = -MMD -MP
 RM = rm -rf
 
 BUILDDIR = obj
-SRCS = ScalarConverter.cpp\
+SRCS = Serializer.cpp\
 	main.cpp
 
 OBJS = $(SRCS:%.cpp=$(BUILDDIR)/%.o)
