@@ -6,13 +6,14 @@
 /*   By: zsonie <zsonie@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/11 23:59:27 by zsonie            #+#    #+#             */
-/*   Updated: 2026/04/12 02:10:45 by zsonie           ###   ########lyon.fr   */
+/*   Updated: 2026/04/12 02:33:01 by zsonie           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ScalarConverter.hpp"
 #include <iostream>
 #include <iomanip>
+#include <cstdlib>
 
 enum Type {CHAR, INT, FLOAT, DOUBLE};
 
@@ -46,6 +47,32 @@ static void printFromChar(char c)
 	std::cout << "double: " << std::fixed << std::setprecision(1) << static_cast<double>(c) << std::endl;
 } 
 
+static void printFromInt(long l)
+{
+	std::cout << "char: ";
+	if (l < 0 || l > 127)
+		std::cout << "impossible" << std::endl;
+	else if (!isprint(static_cast<int>(l)))
+		std::cout << "non-displayable" << std::endl;
+	else
+		std::cout << "'" << static_cast<char>(l) << "'" << std::endl;
+	
+	std::cout << "int: ";
+	if (l < -2147483648 || l > 2147483647)
+		std::cout << "impossible" << std::endl;
+	else
+		std::cout << static_cast<int>(l) << std::endl;
+
+	std::cout << "float: " << std::fixed << std::setprecision(1) << static_cast<float>(l) << "f" << std::endl;
+	std::cout << "double: " << std::fixed << std::setprecision(1) \
+	<< static_cast<double>(l) << std::endl;
+}
+
+// static void printFromFloat(float f)
+// {
+	
+// }
+
 void ScalarConverter::convert(std::string const &str)
 {
 	Type type = detectType(str);
@@ -56,7 +83,7 @@ void ScalarConverter::convert(std::string const &str)
 			printFromChar(str[1]);
 			break;
 		case INT:
-			//printFromInt();
+			printFromInt(std::strtol(str.c_str(), NULL, 10));
 			break;
 		case FLOAT:
 			//printFromFloat();
