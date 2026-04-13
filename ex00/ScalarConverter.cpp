@@ -6,7 +6,7 @@
 /*   By: zsonie <zsonie@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/11 23:59:27 by zsonie            #+#    #+#             */
-/*   Updated: 2026/04/12 22:54:44 by zsonie           ###   ########lyon.fr   */
+/*   Updated: 2026/04/13 18:08:35 by zsonie           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@
 #include <cerrno>
 
 ScalarConverter::ScalarConverter(){};
-ScalarConverter::ScalarConverter(ScalarConverter &src){};
-ScalarConverter &ScalarConverter::operator=(ScalarConverter const &copy){return *this;};
+ScalarConverter::ScalarConverter(ScalarConverter &src){static_cast<void>(src);};
+ScalarConverter &ScalarConverter::operator=(ScalarConverter const &copy){static_cast<void>(copy); return *this;};
 ScalarConverter::~ScalarConverter(){};
 
 enum Type
